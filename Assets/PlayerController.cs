@@ -9,15 +9,20 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private int numJump;
     private Vector2 startPos;
+    private int score;
+    private SpriteRenderer sr;
 
+    [SerializeField] Animator animator;
     [SerializeField] int speed = 5;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         numJump = 0;
         startPos = transform.position;
+        score = 0;
     }
 
     void OnCollisionEnter2D(Collision2D collision) 
@@ -47,7 +52,8 @@ public class PlayerController : MonoBehaviour
 
     void OnMove(InputValue value) {
         movementVector = value.Get<Vector2>();
-        Debug.Log(movementVector); 
+        animator.SetBool("Walk_Right", !Mathf.Approximately(movementVector.x, 0));
+        sr.flipX = movementVector.x < 0;
     }
 
     void OnJump(InputValue value) {
@@ -56,4 +62,14 @@ public class PlayerController : MonoBehaviour
         }
         numJump++;
     }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.gameObject.CompareTag("Collectable")) {
+            other.gameObject.SetActive(false);
+            score++;
+            Debug.Log("My score is: " + score);
+        }
+    }
+
+    
 }
